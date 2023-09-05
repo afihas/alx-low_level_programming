@@ -1,86 +1,92 @@
+
+Adeboye22
+/
+alx-low_level_programming
+Public
+Code
+Issues
+Pull requests
+Actions
+Projects
+Security
+Insights
+alx-low_level_programming/0x15-file_io/100-elf_header.c
+@Adeboye22
+Adeboye22 elf header function
+ History
+ 1 contributor
+302 lines (274 sloc)  6.16 KB
 #include "main.h"
 
 /*
- * e_ident[] - IDENTIFICATION INDEXES
- *
- * Description: The initial bytes mark the file as an object file
- *              and provide machine-independent data.
- * The initial bytes of an ELF header (and an object file)
- *  correspond to the e_ident member.
-*/
+ * File: 100-elf_header.c
+ * Auth: David Musau (Norman David)
+ */
 
 /**
- * check_if_elf - checks if file is an ELF file by checking if it
- *                contains the magic numbers/file signature of an ELF file
+ * check_elf - Checks if a file is an ELF file.
+ * @e_ident: A pointer to an array containing the ELF magic numbers.
  *
- * @e_ident: a pointer to an array of bytes specifies
- *           how to interpret the file
- *
- * Return: nothing
-*/
-void check_if_elf(unsigned char *e_ident)
+ * Description: If the file is not an ELF file - exit code 98.
+ */
+void check_elf(unsigned char *e_ident)
 {
-	int index = 0;
+	int i;
 
-	while (index < 4)
+	for (i = 0; i < 4; i++)
 	{
-		if (e_ident[index] != 127 &&
-		    e_ident[index] != 'E' &&
-		    e_ident[index] != 'L' &&
-		    e_ident[index] != 'F') /*0x7F is 127 in ASCII*/
+		if (e_ident[i] != 127 &&
+		    e_ident[i] != 'E' &&
+		    e_ident[i] != 'L' &&
+		    e_ident[i] != 'F')
 		{
 			dprintf(STDERR_FILENO, "Error: Not an ELF file\n");
 			exit(98);
 		}
-
-		index++;
 	}
 }
 
 /**
- * print_magic - prints the magic numbers of the ELF file
+ * print_magic - Prints the magic numbers of an ELF header.
+ * @e_ident: A pointer to an array containing the ELF magic numbers.
  *
- * @e_ident: a pointer to an array of bytes specifies
- *           how to interpret the file
- *
- * Return: nothing
-*/
+ * Description: Magic numbers are separated by spaces.
+ */
 void print_magic(unsigned char *e_ident)
 {
-	int index = 0;
+	int x;
 
-	printf("  Magic    ");
+	printf("  Magic:   ");
 
-	while (index < EI_NIDENT) /*EI_NIDENT == sizeof(e_ident[]) = 16*/
+	for (x = 0; x < EI_NIDENT; x++)
 	{
-		printf("%02x", e_ident[index]);
+		printf("%02x", e_ident[x]);
 
-		if (index == EI_NIDENT - 1)
+		if (x == EI_NIDENT - 1)
 			printf("\n");
 		else
-			printf(" "); /*space each number*/
-
-		index++;
+			printf(" ");
 	}
 }
 
 /**
- * print_class - prints the class of the ELF file
- *
- * @e_ident: a pointer to an array of bytes specifies
- *           how to interpret the file
- *
- * Return: nothing
-*/
-void print_class(unsigned char *e_ident)
- * print_type - prints the type of the ELF file
- *
- * @e_type: the object file type
- * @e_ident: a pointer to an array of bytes specifies
- *           how to interpret the file
- *
- * Return: nothing
-*/
+ * print_class - Prints the class of an ELF header.
+ * @e_ident: A pointer to an array containing the ELF class.
+ */
+ * print_abi - Prints the ABI version of an ELF header.
+ * @e_ident: A pointer to an array containing the ELF ABI version.
+ */
+void print_abi(unsigned char *e_ident)
+{
+	printf("  ABI Version:                       %d\n",
+	       e_ident[EI_ABIVERSION]);
+}
+
+/**
+ * print_type - Prints the type of an ELF header.
+ * @e_type: The ELF type.
+ * @e_ident: A pointer to an array containing the ELF class.
+ */
 void print_type(unsigned int e_type, unsigned char *e_ident)
 {
 	if (e_ident[EI_DATA] == ELFDATA2MSB)
@@ -90,37 +96,31 @@ void print_type(unsigned int e_type, unsigned char *e_ident)
 
 	switch (e_type)
 	{
-		case ET_NONE:
-			printf("NONE (Unknown type)\n");
-			break;
-		case ET_REL:
-			printf("REL (Relocatable file)\n");
-			break;
-		case ET_EXEC:
-			printf("EXEC (Exexutable file)\n");
-			break;
-		case ET_DYN:
-			printf("DYN (Shared object file)\n");
-			break;
-		case ET_CORE:
-			printf("CORE (Core file)\n");
-			break;
-		default:
-			printf("<unknown: %x\n", e_type);
+	case ET_NONE:
+		printf("NONE (None)\n");
+		break;
+	case ET_REL:
+		printf("REL (Relocatable file)\n");
+		break;
+	case ET_EXEC:
+		printf("EXEC (Executable file)\n");
+		break;
+	case ET_DYN:
+		printf("DYN (Shared object file)\n");
+		break;
+	case ET_CORE:
+		printf("CORE (Core file)\n");
+		break;
+	default:
+		printf("<unknown: %x>\n", e_type);
 	}
 }
 
 /**
- * print_entry - prints the entry point of an ELF file
- *
- * @e_entry: the virtual memory address from where the
- *           process starts executing
- *
- * @e_ident: a pointer to an array of bytes specifies
- *           how to interpret the file
- *
- * Return: nothing
-*/
+ * print_entry - Prints the entry point of an ELF header.
+ * @e_entry: The address of the ELF entry point.
+ * @e_ident: A pointer to an array containing the ELF class.
+ */
 void print_entry(unsigned long int e_entry, unsigned char *e_ident)
 {
 	printf("  Entry point address:               ");
@@ -134,77 +134,77 @@ void print_entry(unsigned long int e_entry, unsigned char *e_ident)
 
 	if (e_ident[EI_CLASS] == ELFCLASS32)
 		printf("%#x\n", (unsigned int)e_entry);
+
 	else
 		printf("%#lx\n", e_entry);
 }
 
 /**
- * close_file - closes the ELF file
+ * close_elf - Closes an ELF file.
+ * @elf: The file descriptor of the ELF file.
  *
- * @elf_file: the file descriptor for the ELF file
- *
- * Return: nothing
-*/
-void close_file(int elf_file)
+ * Description: If the file cannot be closed - exit code 98.
+ */
+void close_elf(int elf)
 {
-	if (close(elf_file) == -1)
+	if (close(elf) == -1)
 	{
 		dprintf(STDERR_FILENO,
-			"Error: Can't close fd %d\n", elf_file);
+			"Error: Can't close fd %d\n", elf);
 		exit(98);
 	}
 }
 
 /**
- * main - Entry point
+ * main - Displays the information contained in the
+ *        ELF header at the start of an ELF file.
+ * @argc: The number of arguments supplied to the program.
+ * @argv: An array of pointers to the arguments.
  *
- * Description: elf_header_parser file
+ * Return: 0 on success.
  *
- * @argc: argument counter
- * @argv: argument vector
- *
- * Return: Always 0 (success)
-*/
+ * Description: If the file is not an ELF File or
+ *              the function fails - exit code 98.
+ */
 int main(int __attribute__((__unused__)) argc, char *argv[])
 {
-	Elf64_Ehdr *elf;
-	int elf_file, read_file;
+	Elf64_Ehdr *header;
+	int fd, s;
 
-	elf_file = open(argv[1], O_RDONLY);
-	if (elf_file == -1)
+	fd = open(argv[1], O_RDONLY);
+	if (fd == -1)
 	{
 		dprintf(STDERR_FILENO, "Error: Can't read file %s\n", argv[1]);
 		exit(98);
 	}
-
-	elf = malloc(sizeof(Elf64_Ehdr));
-	if (elf == NULL)
+	header = malloc(sizeof(Elf64_Ehdr));
+	if (header == NULL)
 	{
-		close_file(elf_file);
-		free(elf);
+		close_elf(fd);
 		dprintf(STDERR_FILENO, "Error: Can't read file %s\n", argv[1]);
 		exit(98);
 	}
-
-	read_file = read(elf_file, elf, sizeof(Elf64_Ehdr));
-	if (read_file == -1)
+	s = read(fd, header, sizeof(Elf64_Ehdr));
+	if (s == -1)
 	{
-		free(elf);
-		close_file(elf_file);
+		free(header);
+		close_elf(fd);
 		dprintf(STDERR_FILENO, "Error: `%s`: No such file\n", argv[1]);
 		exit(98);
 	}
-	check_if_elf(elf->e_ident);
+
+	check_elf(header->e_ident);
 	printf("ELF Header:\n");
-	print_magic(elf->e_ident);
-	print_class(elf->e_ident);
-	print_data(elf->e_ident);
-	print_version(elf->e_ident);
-	print_osabi(elf->e_ident);
-	print_abi(elf->e_ident);
-	print_type(elf->e_type, elf->e_ident);
-	print_entry(elf->e_entry, elf->e_ident);
-	free(elf);
-	close_file(elf_file);
+	print_magic(header->e_ident);
+	print_class(header->e_ident);
+	print_data(header->e_ident);
+	print_version(header->e_ident);
+	print_osabi(header->e_ident);
+	print_abi(header->e_ident);
+	print_type(header->e_type, header->e_ident);
+	print_entry(header->e_entry, header->e_ident);
+
+	free(header);
+	close_elf(fd);
 	return (0);
 }
